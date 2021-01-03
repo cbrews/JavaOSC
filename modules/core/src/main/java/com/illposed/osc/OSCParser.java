@@ -51,6 +51,9 @@ public class OSCParser {
 	public static final byte TYPES_VALUES_SEPARATOR = (byte) ',';
 	// Public API
 	@SuppressWarnings("WeakerAccess")
+	public static final byte TYPES_VALUES_SEPARATOR_SLIP = (byte) 192;
+	// Public API
+	@SuppressWarnings("WeakerAccess")
 	public static final char TYPE_ARRAY_BEGIN = (byte) '[';
 	// Public API
 	@SuppressWarnings("WeakerAccess")
@@ -274,15 +277,21 @@ public class OSCParser {
 		// The next byte should be a TYPES_VALUES_SEPARATOR, but some legacy code may omit it
 		// in case of no arguments, according to "OSC Messages" in:
 		// http://opensoundcontrol.org/spec-1_0
+
+		byte separator = TYPES_VALUES_SEPARATOR;
+		if (this.getProperties().get("protocol") == "SLIP") {
+			separator = TYPES_VALUES_SEPARATOR_SLIP;
+		}
+
 		if (rawInput.hasRemaining()) {
-			if (rawInput.get(rawInput.position()) == TYPES_VALUES_SEPARATOR) {
-				// position++ to skip the TYPES_VALUES_SEPARATOR
+			if (rawInput.get(rawInput.position()) == separator) {
+				// position++ to skip the separator
 				rawInput.get();
 				typeTags = readString(rawInput);
 			} else {
 				// data format is invalid
 				throw new OSCParseException(
-						"No '" + TYPES_VALUES_SEPARATOR + "' present after the address, "
+						"No '" + separator + "' present after the address, "
 								+ "but there is still more data left in the message",
 						rawInput);
 			}

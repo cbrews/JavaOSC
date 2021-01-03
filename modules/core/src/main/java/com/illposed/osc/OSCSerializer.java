@@ -239,8 +239,12 @@ public class OSCSerializer {
 	 * @throws OSCSerializeException if the message arguments failed to serialize
 	 */
 	private void writeArguments(final OSCMessage message) throws OSCSerializeException {
+		if (this.getProperties().get("protocol") == "SLIP") {
+			output.put(OSCParser.TYPES_VALUES_SEPARATOR_SLIP);
+		} else {
+			output.put(OSCParser.TYPES_VALUES_SEPARATOR);
+		}
 
-		output.put(OSCParser.TYPES_VALUES_SEPARATOR);
 		writeTypeTags(message.getArguments());
 		for (final Object argument : message.getArguments()) {
 			write(argument);
